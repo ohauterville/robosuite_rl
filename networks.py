@@ -18,7 +18,7 @@ class CriticNetwork(nn.Module):
         checkpoint_dir="tmp/td3",
         learning_rate=10e-3,
         *args,
-        **kwargs
+        **kwargs,
     ):
         super(CriticNetwork, self).__init__(*args, **kwargs)
 
@@ -28,14 +28,16 @@ class CriticNetwork(nn.Module):
         self.fc2_dims = fc2_dims
         self.name = name
         self.checkpoint_dir = checkpoint_dir
-        self.checkpoint_file = os.path.join(self.checkpoint_dir, name+"_td3")
+        self.checkpoint_file = os.path.join(self.checkpoint_dir, name + "_td3")
         self.learning_rate = learning_rate
 
-        self.fc1 = nn.Linear(self.input_dims[0]+n_actions, self.fc1_dims)
+        self.fc1 = nn.Linear(self.input_dims[0] + n_actions, self.fc1_dims)
         self.fc2 = nn.Linear(self.fc1_dims, self.fc2_dims)
         self.q1 = nn.Linear(self.fc2_dims, 1)
 
-        self.optimizer = optim.Adam(self.parameters(), lr=learning_rate, weight_decay=0.005) 
+        self.optimizer = optim.Adam(
+            self.parameters(), lr=learning_rate, weight_decay=0.005
+        )
 
         self.device = T.device("cuda:0" if T.cuda.is_available() else "cpu")
         print(f"Created CriticNetwork on device: {self.device}")
@@ -49,7 +51,7 @@ class CriticNetwork(nn.Module):
         q1 = self.q1(action_value)
 
         return q1
-    
+
     def save_checkpoint(self):
         T.save(self.state_dict(), self.checkpoint_file)
 
@@ -59,7 +61,18 @@ class CriticNetwork(nn.Module):
 
 class ActorNetwork(nn.Module):
 
-    def __init__(self, input_dims, fc1_dims=256, fc2_dims=128, learning_rate=10e-3, n_actions=2, name="actor", checkpoint_dir="tmp/td3", *args, **kwargs):
+    def __init__(
+        self,
+        input_dims,
+        fc1_dims=256,
+        fc2_dims=128,
+        learning_rate=10e-3,
+        n_actions=2,
+        name="actor",
+        checkpoint_dir="tmp/td3",
+        *args,
+        **kwargs,
+    ):
         super(ActorNetwork, self).__init__(*args, **kwargs)
 
         self.input_dims = input_dims
@@ -68,14 +81,14 @@ class ActorNetwork(nn.Module):
         self.fc2_dims = fc2_dims
         self.name = name
         self.checkpoint_dir = checkpoint_dir
-        self.checkpoint_file = os.path.join(self.checkpoint_dir, name+"_td3")
+        self.checkpoint_file = os.path.join(self.checkpoint_dir, name + "_td3")
 
         self.fc1 = nn.Linear(*self.input_dims, self.fc1_dims)
         self.fc2 = nn.Linear(self.fc1_dims, self.fc2_dims)
         self.output = nn.Linear(self.fc2_dims, self.n_actions)
 
         self.optimizer = optim.Adam(self.parameters(), lr=learning_rate)
-        
+
         self.device = T.device("cuda:0" if T.cuda.is_available() else "cpu")
         print(f"Created ActorNetwork on device: {self.device}")
 
