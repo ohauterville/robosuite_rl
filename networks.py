@@ -70,7 +70,7 @@ class ActorNetwork(nn.Module):
         self.checkpoint_dir = checkpoint_dir
         self.checkpoint_file = os.path.join(self.checkpoint_dir, name+"_td3")
 
-        self.fc1 = nn.Linear(self.input_dims, self.fc1_dims)
+        self.fc1 = nn.Linear(*self.input_dims, self.fc1_dims)
         self.fc2 = nn.Linear(self.fc1_dims, self.fc2_dims)
         self.output = nn.Linear(self.fc2_dims, self.n_actions)
 

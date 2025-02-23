@@ -6,6 +6,8 @@ from torch.utils.tensorboard import SummaryWriter
 import robosuite as suite
 from robosuite.wrappers import GymWrapper
 
+from networks import CriticNetwork, ActorNetwork
+
 if __name__ == "__main__":
     if not os.path.exists("tmp/td3"):
         os.makedirs("tmp/td3")
@@ -26,3 +28,6 @@ if __name__ == "__main__":
     )
 
     env = GymWrapper(env)
+
+    critic_network = CriticNetwork([8], 8)
+    actor_network = ActorNetwork([8], 8)
