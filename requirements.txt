@@ -1,8 +1,8 @@
-gym==0.23.0
+gym==0.23.0 #0.26.2
 pybullet==3.2.0
 matplotlib==3.8.2
 tensorboard==2.15.1
-robosuite==1.4.0
+robosuite==1.4.0 #1.5.1
 termcolor==2.4.0
 h5py==3.10.0
 --extra-index-url https://download.pytorch.org/whl/cu118
