@@ -1,2 +1,4 @@
 __pycache__/*
 tmp/*
+logs/*
+HELP.md

@@ -16,9 +16,9 @@ class Agent:
         env,
         gamma=0.99,
         update_actor_interval=2,
-        warmup=1000,
+        warmup=10000,
         n_actions=2,
-        max_size=1000000,
+        max_size=1e6,
         layer1_size=56,
         layer2_size=128,
         batch_size=100,
@@ -33,7 +33,7 @@ class Agent:
         self.learn_step_cntr = 0
         self.time_step = 0
         self.warmup = warmup
-        self.nactions = n_actions
+        self.n_actions = n_actions
         self.update_actor_iter = update_actor_interval
 
         # Create the networks
@@ -92,6 +92,13 @@ class Agent:
             learning_rate=critic_learning_rate,
         )
 
+        self.actor.to(self.actor.device)
+        self.critic1.to(self.critic1.device)
+        self.critic2.to(self.critic2.device)
+        self.target_actor.to(self.target_actor.device)
+        self.target_critic1.to(self.target_critic1.device)
+        self.target_critic2.to(self.target_critic2.device)
+
         self.noise = noise
         self.update_network_parameters(tau=1)
 
@@ -99,10 +106,10 @@ class Agent:
         if self.time_step < self.warmup and validation is False:
             mu = T.tensor(
                 np.random.normal(scale=self.noise, size=(self.n_actions,))
-            ).tu(self.actor.devices)
+            ).to(self.actor.device)
         else:
             state = T.tensor(observation, dtype=T.float).to(self.actor.device)
-            mu = self.actor.forward(state).to(self.Actor.device)
+            mu = self.actor.forward(state).to(self.actor.device)
 
         mu_prime = mu + T.tensor(np.random.normal(scale=self.noise), dtype=T.float).to(
             self.actor.device
@@ -177,11 +184,66 @@ class Agent:
         self.actor.optimizer.step()
         self.update_network_parameters()
 
-    def update_network_parameters(self, tau):
-        pass
+    def update_network_parameters(self, tau=None):
+        if tau == None:
+            tau = self.tau
+
+        actor_params = self.actor.named_parameters()
+        critic1_params = self.critic1.named_parameters()
+        critic2_params = self.critic2.named_parameters()
+        target_actor_params = self.target_actor.named_parameters()
+        target_critic1_params = self.target_critic1.named_parameters()
+        target_critic2_params = self.target_critic2.named_parameters()
+
+        actor_state_dict = dict(actor_params)
+        critic1_state_dict = dict(critic1_params)
+        critic2_state_dict = dict(critic2_params)
+        target_actor_state_dict = dict(target_actor_params)
+        target_critic1_state_dict = dict(target_critic1_params)
+        target_critic2_state_dict = dict(target_critic2_params)
+
+        for name in critic1_state_dict:
+            critic1_state_dict[name] = (
+                tau * critic1_state_dict[name].clone()
+                + (1 - tau) * target_critic1_state_dict[name].clone()
+            )
+
+        for name in critic2_state_dict:
+            critic1_state_dict[name] = (
+                tau * critic2_state_dict[name].clone()
+                + (1 - tau) * target_critic2_state_dict[name].clone()
+            )
+
+        for name in actor_state_dict:
+            actor_state_dict[name] = (
+                tau * actor_state_dict[name].clone()
+                + (1 - tau) * target_actor_state_dict[name].clone()
+            )
+
+        self.target_critic1.load_state_dict(critic1_state_dict)
+        self.target_critic2.load_state_dict(critic2_state_dict)
+        self.target_actor.load_state_dict(actor_state_dict)
 
     def save_models(self):
-        pass
+        try:
+            self.actor.save_checkpoint()
+            self.target_actor.save_checkpoint()
+            self.critic1.save_checkpoint()
+            self.target_critic1.save_checkpoint()
+            self.critic2.save_checkpoint()
+            self.target_critic2.save_checkpoint()
+            print("Successfully saved the models.")
+        except:
+            print("Failed to save the models.")
 
     def load_models(self):
-        pass
+        try:
+            self.actor.load_checkpoint()
+            self.target_actor.load_checkpoint()
+            self.critic1.load_checkpoint()
+            self.target_critic1.load_checkpoint()
+            self.critic2.load_checkpoint()
+            self.target_critic2.load_checkpoint()
+            print("Successfully loaded models.")
+        except Exception as e:
+            print("Failed to load models. Starting from scratch.")

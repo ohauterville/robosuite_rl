@@ -39,7 +39,7 @@ class CriticNetwork(nn.Module):
             self.parameters(), lr=learning_rate, weight_decay=0.005
         )
 
-        self.device = T.device("cuda:0" if T.cuda.is_available() else "cpu")
+        self.device = T.device("cuda" if T.cuda.is_available() else "cpu")
         print(f"Created CriticNetwork on device: {self.device}")
 
     def forward(self, state, action):
@@ -55,7 +55,7 @@ class CriticNetwork(nn.Module):
     def save_checkpoint(self):
         T.save(self.state_dict(), self.checkpoint_file)
 
-    def load_chechpoint(self):
+    def load_checkpoint(self):
         self.load_state_dict(T.load(self.checkpoint_file))
 
 
@@ -89,7 +89,7 @@ class ActorNetwork(nn.Module):
 
         self.optimizer = optim.Adam(self.parameters(), lr=learning_rate)
 
-        self.device = T.device("cuda:0" if T.cuda.is_available() else "cpu")
+        self.device = T.device("cuda" if T.cuda.is_available() else "cpu")
         print(f"Created ActorNetwork on device: {self.device}")
 
     def forward(self, state):
@@ -99,9 +99,12 @@ class ActorNetwork(nn.Module):
         x = F.relu(x)
 
         x = T.tanh(self.output(x))
+        return x
 
     def save_checkpoint(self):
+        if not os.path.exists(self.checkpoint_dir):
+            os.makedirs(self.checkpoint_dir)
         T.save(self.state_dict(), self.checkpoint_file)
 
-    def load_chechpoint(self):
+    def load_checkpoint(self):
         self.load_state_dict(T.load(self.checkpoint_file))
