@@ -7,7 +7,6 @@ import robosuite as suite
 from robosuite.wrappers import GymWrapper
 
 if __name__ == "__main__":
-
     if not os.path.exists("tmp/td3"):
         os.makedirs("tmp/td3")
 
@@ -25,7 +24,7 @@ if __name__ == "__main__":
         has_offscreen_renderer=True,
         horizon=300,
         reward_shaping=True,
-        control_freq = 20,
+        control_freq=20,
     )
 
     env = GymWrapper(env)
