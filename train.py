@@ -10,7 +10,7 @@ if __name__ == "__main__":
 
     checkpoint_dir = os.path.join("tmp/td3", run_name)
     log_dir = os.path.join("logs", run_name)
-    
+
     if not os.path.exists(checkpoint_dir):
         os.makedirs(checkpoint_dir)
     if not os.path.exists(log_dir):
@@ -54,7 +54,7 @@ if __name__ == "__main__":
 
     writer = SummaryWriter(log_dir)
     n_games = 1000
-    best_score = 0 # to do later
+    best_score = 0  # to do later
 
     episode_identifier = f"{run_name}=actor_learning_rate={actor_learning_rate} critic_learning_rate={critic_learning_rate} layer1_size={layer1_size} layer2_size={layer2_size}"
 
@@ -77,7 +77,12 @@ if __name__ == "__main__":
 
         print(f"Episode: {i} score {score}")
 
-        if i % 25 == 0 or i == n_games-1:
+        if i % 25 == 0 or i == n_games - 1:
             agent.save_models()
 
+        if score > best_score:
+            agent.save_models(best_models=True)
+            best_score = score
+
     print("\nTraining complete.\n")
+    print(f"Best score: {best_score}\n")

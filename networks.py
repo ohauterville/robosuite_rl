@@ -50,11 +50,17 @@ class CriticNetwork(nn.Module):
 
         return q1
 
-    def save_checkpoint(self):
-        T.save(self.state_dict(), self.checkpoint_file)
+    def save_checkpoint(self, best_models=False):
+        if not best_models:
+            T.save(self.state_dict(), self.checkpoint_file)
+        else:
+            T.save(self.state_dict(), self.checkpoint_file + "_best")
 
-    def load_checkpoint(self):
-        self.load_state_dict(T.load(self.checkpoint_file))
+    def load_checkpoint(self, best_models=False):
+        if not best_models:
+            self.load_state_dict(T.load(self.checkpoint_file))
+        else:
+            self.load_state_dict(T.load(self.checkpoint_file + "_best"))
 
 
 class ActorNetwork(nn.Module):
@@ -97,8 +103,14 @@ class ActorNetwork(nn.Module):
         x = T.tanh(self.output(x))
         return x
 
-    def save_checkpoint(self):
-        T.save(self.state_dict(), self.checkpoint_file)
+    def save_checkpoint(self, best_models=False):
+        if not best_models:
+            T.save(self.state_dict(), self.checkpoint_file)
+        else:
+            T.save(self.state_dict(), self.checkpoint_file + "_best")
 
-    def load_checkpoint(self):
-        self.load_state_dict(T.load(self.checkpoint_file))
+    def load_checkpoint(self, best_models=False):
+        if not best_models:
+            self.load_state_dict(T.load(self.checkpoint_file))
+        else:
+            self.load_state_dict(T.load(self.checkpoint_file + "_best"))

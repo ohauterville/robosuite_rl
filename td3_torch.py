@@ -24,7 +24,7 @@ class Agent:
         batch_size=100,
         noise=0.1,
     ):
-        self.checkpoint_dir = checkpoint_dir,
+        self.checkpoint_dir = (checkpoint_dir,)
         self.gamma = gamma
         self.tau = tau
         self.max_action = env.action_space.high
@@ -179,7 +179,7 @@ class Agent:
         critic_loss.backward()
 
         # Deepseek's suggestion
-        # It is to stabilize the critics 
+        # It is to stabilize the critics
         T.nn.utils.clip_grad_norm_(self.critic1.parameters(), 1.0)
         T.nn.utils.clip_grad_norm_(self.critic2.parameters(), 1.0)
 
@@ -239,26 +239,32 @@ class Agent:
         self.target_critic2.load_state_dict(critic2_state_dict)
         self.target_actor.load_state_dict(actor_state_dict)
 
-    def save_models(self):
+    def save_models(self, best_models=False):
         try:
-            self.actor.save_checkpoint()
-            self.target_actor.save_checkpoint()
-            self.critic1.save_checkpoint()
-            self.target_critic1.save_checkpoint()
-            self.critic2.save_checkpoint()
-            self.target_critic2.save_checkpoint()
-            print("Successfully saved the models.")
+            self.actor.save_checkpoint(best_models)
+            self.target_actor.save_checkpoint(best_models)
+            self.critic1.save_checkpoint(best_models)
+            self.target_critic1.save_checkpoint(best_models)
+            self.critic2.save_checkpoint(best_models)
+            self.target_critic2.save_checkpoint(best_models)
+            if not best_models:
+                print("Successfully saved the models.")
+            else:
+                print("Successfully saved the best models.")
         except:
             print("Failed to save the models.")
 
-    def load_models(self):
+    def load_models(self, best_models=False):
         try:
-            self.actor.load_checkpoint()
-            self.target_actor.load_checkpoint()
-            self.critic1.load_checkpoint()
-            self.target_critic1.load_checkpoint()
-            self.critic2.load_checkpoint()
-            self.target_critic2.load_checkpoint()
-            print("Successfully loaded models.")
+            self.actor.load_checkpoint(best_models)
+            self.target_actor.load_checkpoint(best_models)
+            self.critic1.load_checkpoint(best_models)
+            self.target_critic1.load_checkpoint(best_models)
+            self.critic2.load_checkpoint(best_models)
+            self.target_critic2.load_checkpoint(best_models)
+            if not best_models:
+                print("Successfully loaded models.")
+            else:
+                print("Successfully loaded the best models.")
         except Exception as e:
             print("Failed to load models. Starting from scratch.")

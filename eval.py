@@ -9,8 +9,9 @@ from robosuite.wrappers import GymWrapper
 from td3_torch import Agent
 
 if __name__ == "__main__":
-    if not os.path.exists("tmp/td3"):
-        os.makedirs("tmp/td3")
+    run_name = "run_0"
+
+    checkpoint_dir = os.path.join("tmp/td3", run_name)
 
     env_name = "Door"
 
@@ -51,10 +52,9 @@ if __name__ == "__main__":
     )
 
     n_games = 3
-    best_score = 0
     episode_identifier = f"0 - actor_learning_rate={actor_learning_rate} critic_learning_rate={critic_learning_rate} layer1_size={layer1_size} layer2_size={layer2_size}"
 
-    agent.load_models()
+    agent.load_models(best_models=True)
 
     for i in range(n_games):
         observation = env.reset()
