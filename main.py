@@ -1,7 +1,4 @@
-import time
 import os
-import gym
-import numpy as np
 from torch.utils.tensorboard import SummaryWriter
 import robosuite as suite
 from robosuite.wrappers import GymWrapper
@@ -10,6 +7,8 @@ from td3_torch import Agent
 if __name__ == "__main__":
     if not os.path.exists("tmp/td3"):
         os.makedirs("tmp/td3")
+
+    run_name = "Deepseek"
 
     env_name = "Door"
 
@@ -49,7 +48,8 @@ if __name__ == "__main__":
     writer = SummaryWriter("logs")
     n_games = 1000
     best_score = 0
-    episode_identifier = f"0 - actor_learning_rate={actor_learning_rate} critic_learning_rate={critic_learning_rate} layer1_size={layer1_size} layer2_size={layer2_size}"
+
+    episode_identifier = f"{run_name} - actor_learning_rate={actor_learning_rate} critic_learning_rate={critic_learning_rate} layer1_size={layer1_size} layer2_size={layer2_size}"
 
     agent.load_models()
 
@@ -66,9 +66,9 @@ if __name__ == "__main__":
             agent.learn()
             observation = next_observation
 
-        writer.add_scalar(f"Score - {episode_identifier}", score, global_step=i)
+        writer.add_scalar(f"Run - {episode_identifier}", score, global_step=i)
 
-        if i % 10 == 0:
+        if i % 10 == 0 or i == n_games-1:
             agent.save_models()
 
         print(f"Episode: {i} score {score}")

@@ -17,10 +17,8 @@ class CriticNetwork(nn.Module):
         name="critic",
         checkpoint_dir="tmp/td3",
         learning_rate=10e-3,
-        *args,
-        **kwargs,
     ):
-        super(CriticNetwork, self).__init__(*args, **kwargs)
+        super(CriticNetwork, self).__init__()
 
         self.input_dims = input_dims
         self.n_actions = n_actions
@@ -35,7 +33,7 @@ class CriticNetwork(nn.Module):
         self.fc2 = nn.Linear(self.fc1_dims, self.fc2_dims)
         self.q1 = nn.Linear(self.fc2_dims, 1)
 
-        self.optimizer = optim.Adam(
+        self.optimizer = optim.AdamW(
             self.parameters(), lr=learning_rate, weight_decay=0.005
         )
 
@@ -70,10 +68,8 @@ class ActorNetwork(nn.Module):
         n_actions=2,
         name="actor",
         checkpoint_dir="tmp/td3",
-        *args,
-        **kwargs,
     ):
-        super(ActorNetwork, self).__init__(*args, **kwargs)
+        super(ActorNetwork, self).__init__()
 
         self.input_dims = input_dims
         self.n_actions = n_actions
@@ -102,8 +98,6 @@ class ActorNetwork(nn.Module):
         return x
 
     def save_checkpoint(self):
-        if not os.path.exists(self.checkpoint_dir):
-            os.makedirs(self.checkpoint_dir)
         T.save(self.state_dict(), self.checkpoint_file)
 
     def load_checkpoint(self):

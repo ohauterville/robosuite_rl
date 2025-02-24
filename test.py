@@ -30,6 +30,7 @@ if __name__ == "__main__":
     )
 
     env = GymWrapper(env)
+    print(env.action_space.shape[0])
 
     actor_learning_rate = 0.001
     critic_learning_rate = 0.001
@@ -61,12 +62,13 @@ if __name__ == "__main__":
         score = 0
 
         while not done:
-            action = agent.choose_action(observation, validation=True) #important to set validation
+            action = agent.choose_action(
+                observation, validation=True
+            )  # important to set validation
             next_observation, reward, done, info = env.step(action)
             env.render()
             score += reward
             observation = next_observation
-            time.sleep(0.03)
+            time.sleep(0.01)
 
         print(f"Episode: {i} score {score}")
-

@@ -16,10 +16,10 @@ class Agent:
         env,
         gamma=0.99,
         update_actor_interval=2,
-        warmup=10000,
+        warmup=1000,  # should be 1000?
         n_actions=2,
-        max_size=1e6,
-        layer1_size=56,
+        max_size=1000000,
+        layer1_size=256,
         layer2_size=128,
         batch_size=100,
         noise=0.1,
@@ -160,6 +160,7 @@ class Agent:
         target = (
             reward + self.gamma * next_critic_value
         )  # we make an heuristic on next future reward
+        target = target.view(self.bacth_size, 1)
 
         self.critic1.optimizer.zero_grad()
         self.critic2.optimizer.zero_grad()
@@ -170,8 +171,15 @@ class Agent:
         critic_loss = q1_loss + q2_loss
         critic_loss.backward()
 
+        # Deepseek suggestion
+        # It is to stabilize critic stability
+        T.nn.utils.clip_grad_norm_(self.critic1.parameters(), 1.0)
+        T.nn.utils.clip_grad_norm_(self.critic2.parameters(), 1.0)
+
         self.critic1.optimizer.step()
         self.critic2.optimizer.step()
+
+        self.learn_step_cntr += 1
 
         if self.learn_step_cntr % self.update_actor_iter != 0:
             return
@@ -179,7 +187,7 @@ class Agent:
         self.actor.optimizer.zero_grad()
         actor_q1_loss = self.critic1.forward(state, self.actor.forward(state))
         actor_loss = -T.mean(actor_q1_loss)  # we want to maximize
-        actor_loss.backward
+        actor_loss.backward()
 
         self.actor.optimizer.step()
         self.update_network_parameters()
@@ -209,7 +217,7 @@ class Agent:
             )
 
         for name in critic2_state_dict:
-            critic1_state_dict[name] = (
+            critic2_state_dict[name] = (
                 tau * critic2_state_dict[name].clone()
                 + (1 - tau) * target_critic2_state_dict[name].clone()
             )
