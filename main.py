@@ -68,7 +68,9 @@ if __name__ == "__main__":
 
         writer.add_scalar(f"Run - {episode_identifier}", score, global_step=i)
 
+        print(f"Episode: {i} score {score}")
+
         if i % 10 == 0 or i == n_games-1:
             agent.save_models()
 
-        print(f"Episode: {i} score {score}")
+    print("\nTraining complete.\n")
