@@ -5,10 +5,16 @@ from robosuite.wrappers import GymWrapper
 from td3_torch import Agent
 
 if __name__ == "__main__":
-    if not os.path.exists("tmp/td3"):
-        os.makedirs("tmp/td3")
 
-    run_name = "Deepseek"
+    run_name = "run_0"
+
+    checkpoint_dir = os.path.join("tmp/td3", run_name)
+    log_dir = os.path.join("logs", run_name)
+    
+    if not os.path.exists(checkpoint_dir):
+        os.makedirs(checkpoint_dir)
+    if not os.path.exists(log_dir):
+        os.makedirs(log_dir)
 
     env_name = "Door"
 
@@ -36,6 +42,7 @@ if __name__ == "__main__":
     agent = Agent(
         actor_learning_rate=actor_learning_rate,
         critic_learning_rate=critic_learning_rate,
+        checkpoint_dir=checkpoint_dir,
         tau=0.005,
         input_dims=env.observation_space.shape,
         env=env,
@@ -45,11 +52,11 @@ if __name__ == "__main__":
         batch_size=batch_size,
     )
 
-    writer = SummaryWriter("logs")
+    writer = SummaryWriter(log_dir)
     n_games = 1000
-    best_score = 0
+    best_score = 0 # to do later
 
-    episode_identifier = f"{run_name} - actor_learning_rate={actor_learning_rate} critic_learning_rate={critic_learning_rate} layer1_size={layer1_size} layer2_size={layer2_size}"
+    episode_identifier = f"{run_name}=actor_learning_rate={actor_learning_rate} critic_learning_rate={critic_learning_rate} layer1_size={layer1_size} layer2_size={layer2_size}"
 
     agent.load_models()
 
@@ -70,7 +77,7 @@ if __name__ == "__main__":
 
         print(f"Episode: {i} score {score}")
 
-        if i % 10 == 0 or i == n_games-1:
+        if i % 25 == 0 or i == n_games-1:
             agent.save_models()
 
     print("\nTraining complete.\n")

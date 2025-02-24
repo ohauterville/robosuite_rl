@@ -1,4 +1,3 @@
-import os
 import torch as T
 import torch.nn.functional as F
 import numpy as np
@@ -14,6 +13,7 @@ class Agent:
         input_dims,
         tau,
         env,
+        checkpoint_dir="tmp/td3/run_0",
         gamma=0.99,
         update_actor_interval=2,
         warmup=1000,  # should be 1000?
@@ -24,6 +24,7 @@ class Agent:
         batch_size=100,
         noise=0.1,
     ):
+        self.checkpoint_dir = checkpoint_dir,
         self.gamma = gamma
         self.tau = tau
         self.max_action = env.action_space.high
@@ -43,6 +44,7 @@ class Agent:
             fc2_dims=layer2_size,
             n_actions=n_actions,
             name="actor",
+            checkpoint_dir=checkpoint_dir,
             learning_rate=actor_learning_rate,
         )
 
@@ -52,6 +54,7 @@ class Agent:
             fc2_dims=layer2_size,
             n_actions=n_actions,
             name="critic1",
+            checkpoint_dir=checkpoint_dir,
             learning_rate=critic_learning_rate,
         )
 
@@ -61,6 +64,7 @@ class Agent:
             fc2_dims=layer2_size,
             n_actions=n_actions,
             name="critic2",
+            checkpoint_dir=checkpoint_dir,
             learning_rate=critic_learning_rate,
         )
 
@@ -71,6 +75,7 @@ class Agent:
             fc2_dims=layer2_size,
             n_actions=n_actions,
             name="target_actor",
+            checkpoint_dir=checkpoint_dir,
             learning_rate=actor_learning_rate,
         )
 
@@ -80,6 +85,7 @@ class Agent:
             fc2_dims=layer2_size,
             n_actions=n_actions,
             name="target_critic1",
+            checkpoint_dir=checkpoint_dir,
             learning_rate=critic_learning_rate,
         )
 
@@ -89,6 +95,7 @@ class Agent:
             fc2_dims=layer2_size,
             n_actions=n_actions,
             name="target_critic2",
+            checkpoint_dir=checkpoint_dir,
             learning_rate=critic_learning_rate,
         )
 
@@ -171,8 +178,8 @@ class Agent:
         critic_loss = q1_loss + q2_loss
         critic_loss.backward()
 
-        # Deepseek suggestion
-        # It is to stabilize critic stability
+        # Deepseek's suggestion
+        # It is to stabilize the critics 
         T.nn.utils.clip_grad_norm_(self.critic1.parameters(), 1.0)
         T.nn.utils.clip_grad_norm_(self.critic2.parameters(), 1.0)
 

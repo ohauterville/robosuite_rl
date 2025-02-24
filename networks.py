@@ -15,7 +15,7 @@ class CriticNetwork(nn.Module):
         fc1_dims=256,
         fc2_dims=128,
         name="critic",
-        checkpoint_dir="tmp/td3",
+        checkpoint_dir="tmp/td3/run_0",
         learning_rate=10e-3,
     ):
         super(CriticNetwork, self).__init__()
@@ -26,7 +26,7 @@ class CriticNetwork(nn.Module):
         self.fc2_dims = fc2_dims
         self.name = name
         self.checkpoint_dir = checkpoint_dir
-        self.checkpoint_file = os.path.join(self.checkpoint_dir, name + "_td3")
+        self.checkpoint_file = os.path.join(self.checkpoint_dir, self.name)
         self.learning_rate = learning_rate
 
         self.fc1 = nn.Linear(self.input_dims[0] + n_actions, self.fc1_dims)
@@ -67,7 +67,7 @@ class ActorNetwork(nn.Module):
         learning_rate=10e-3,
         n_actions=2,
         name="actor",
-        checkpoint_dir="tmp/td3",
+        checkpoint_dir="tmp/td3/run_0",
     ):
         super(ActorNetwork, self).__init__()
 
@@ -77,7 +77,7 @@ class ActorNetwork(nn.Module):
         self.fc2_dims = fc2_dims
         self.name = name
         self.checkpoint_dir = checkpoint_dir
-        self.checkpoint_file = os.path.join(self.checkpoint_dir, name + "_td3")
+        self.checkpoint_file = os.path.join(self.checkpoint_dir, self.name)
 
         self.fc1 = nn.Linear(*self.input_dims, self.fc1_dims)
         self.fc2 = nn.Linear(self.fc1_dims, self.fc2_dims)
