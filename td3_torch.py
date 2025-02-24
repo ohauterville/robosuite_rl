@@ -250,7 +250,7 @@ class Agent:
             if not best_models:
                 print("Successfully saved the models.")
             else:
-                print("Successfully saved the best models.")
+                print("Successfully saved the best models.\n")
         except:
             print("Failed to save the models.")
 

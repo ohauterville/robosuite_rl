@@ -7,6 +7,7 @@ from td3_torch import Agent
 if __name__ == "__main__":
 
     run_name = "run_0"
+    n_episodes = 1000
 
     checkpoint_dir = os.path.join("tmp/td3", run_name)
     log_dir = os.path.join("logs", run_name)
@@ -53,14 +54,14 @@ if __name__ == "__main__":
     )
 
     writer = SummaryWriter(log_dir)
-    n_games = 1000
-    best_score = 0  # to do later
+    best_score = 0 
+    best_ep = 0
 
     episode_identifier = f"{run_name}=actor_learning_rate={actor_learning_rate} critic_learning_rate={critic_learning_rate} layer1_size={layer1_size} layer2_size={layer2_size}"
 
     agent.load_models()
 
-    for i in range(n_games):
+    for i in range(n_episodes):
         observation = env.reset()
         done = False
         score = 0
@@ -77,12 +78,13 @@ if __name__ == "__main__":
 
         print(f"Episode: {i} score {score}")
 
-        if i % 25 == 0 or i == n_games - 1:
+        if i % 25 == 0 or i == n_episodes - 1:
             agent.save_models()
 
         if score > best_score:
             agent.save_models(best_models=True)
             best_score = score
+            best_ep = i
 
     print("\nTraining complete.\n")
-    print(f"Best score: {best_score}\n")
+    print(f"Best score: {best_score} at episode: {best_ep}\n")
